@@ -189,8 +189,3 @@ portfolio-contact-notifier/
 - GitHub: [@MAH-Rahat](https://github.com/MAH-Rahat)
 - Built with n8n Community Edition · Self-hosted via Docker
 
----
-
-## 📄 License
-
-MIT — free to use, modify, and distribute.
