@@ -1,0 +1,203 @@
+{
+  "name": "Portfolio Contact Form Notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "portfolio-contact",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8a3d1c4a-bb4d-4769-bcd7-3e694ccaf331",
+      "name": "Receive Contact Form",
+      "webhookId": "829c1562-49cb-4ecd-953a-eec97e7040e8"
+    },
+    {
+      "parameters": {
+        "fromEmail": "ashraful4921@gmail.com",
+        "toEmail": "ashraful4921@gmail.com",
+        "subject": "=New Portfolio Message from {{ $json.name }}",
+        "html": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;\">\n  <div style=\"background: white; padding: 30px; border-radius: 8px; border-left: 4px solid #ff6b35;\">\n    <h2 style=\"color: #333; margin-top: 0;\">📬 New Portfolio Message</h2>\n    <table style=\"width: 100%; border-collapse: collapse;\">\n      <tr style=\"border-bottom: 1px solid #eee;\">\n        <td style=\"padding: 12px 0; color: #888; width: 100px;\">Name</td>\n        <td style=\"padding: 12px 0; font-weight: bold;\">{{ $('Receive Contact Form').item.json.body.name }}</td>\n      </tr>\n      <tr style=\"border-bottom: 1px solid #eee;\">\n        <td style=\"padding: 12px 0; color: #888;\">Email</td>\n        <td style=\"padding: 12px 0;\"><a href=\"mailto:{{ $('Receive Contact Form').item.json.body.email }}\">{{ $('Receive Contact Form').item.json.body.email }}</a></td>\n      </tr>\n      <tr>\n        <td style=\"padding: 12px 0; color: #888;\">Message</td>\n        <td style=\"padding: 12px 0;\">{{ $('Receive Contact Form').item.json.body.message }}</td>\n      </tr>\n    </table>\n    <p style=\"color: #aaa; font-size: 12px; margin-bottom: 0;\">Sent via Portfolio Automation · {{ $now }}</p>\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        -128
+      ],
+      "id": "2189d023-d6fc-4691-9734-29b7e47ae3a0",
+      "name": "Send Gmail Notification",
+      "webhookId": "0a54a01f-c9ee-47e2-89fd-11779305b218",
+      "retryOnFail": true,
+      "credentials": {
+        "smtp": {
+          "id": "n5FSrJzFaqnq3hbW",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1564558936",
+        "text": "=🔔 New Portfolio Message!\n\n👤 Name: {{ $('Receive Contact Form').item.json.body.name }}\n📧 Email: {{ $('Receive Contact Form').item.json.body.email }}\n💬 Message: {{ $('Receive Contact Form').item.json.body.message }}\n\n⏰ {{ $now }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        80
+      ],
+      "id": "64cdc148-cf6b-44ac-937b-e8cd48254c64",
+      "name": "Send a text message",
+      "webhookId": "ba9fd833-2864-43af-8339-89585148cd82",
+      "credentials": {
+        "telegramApi": {
+          "id": "jLxNXp5gdAfYbotN",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Name: {{ $('Receive Contact Form').item.json.body.name }}\nMessage: {{ $('Receive Contact Form').item.json.body.message }}\n\nWrite the reply now.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a professional assistant for Rahat, a Full Stack AI Engineer based in Dhaka, Bangladesh.  Someone just submitted a contact form on his portfolio website with the following details:  Name: {{ $('Receive Contact Form').item.json.body.name }} Message: {{ $('Receive Contact Form').item.json.body.message }}  Write a warm, professional auto-reply email body to this person.   Rules: - Address them by their first name - Acknowledge their specific message briefly - Say Rahat will personally respond within 24-48 hours - Keep it to 3-4 sentences maximum - Do NOT make up project details or promises - End with: \"Best regards, Rahat's Assistant\" - Return the email body text only, nothing else"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "=Name: {{ $('Receive Contact Form').item.json.body.name }} Message: {{ $('Receive Contact Form').item.json.body.message }}  Write the reply now."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        80
+      ],
+      "id": "a17c98d7-a3e3-46dd-bb7d-b79a72557347",
+      "name": "AI Auto-Reply Generator"
+    },
+    {
+      "parameters": {
+        "fromEmail": "ashraful4921@gmail.com",
+        "toEmail": "={{ $('Receive Contact Form').item.json.body.email }}",
+        "subject": "=Thanks for reaching out, {{ $('Receive Contact Form').item.json.body.name }}!",
+        "html": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;\">\n  <div style=\"background: white; padding: 30px; border-radius: 8px; border-left: 4px solid #ff6b35;\">\n    <h2 style=\"color: #333; margin-top: 0;\">👋 Thanks for reaching out!</h2>\n    <p style=\"color: #555; line-height: 1.6; white-space: pre-line;\">{{ $json.text }}</p>\n    <hr style=\"border: none; border-top: 1px solid #eee; margin: 20px 0;\">\n    <p style=\"color: #aaa; font-size: 12px; margin: 0;\">This is an automated response · <a href=\"https://github.com/MAH-Rahat\">github.com/MAH-Rahat</a></p>\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        80
+      ],
+      "id": "e465fd10-8c20-4d7f-a4ea-1e60eeb1fad5",
+      "name": "Auto-Reply to Sender",
+      "webhookId": "2755943d-e592-4854-841f-c75365660f0f",
+      "credentials": {
+        "smtp": {
+          "id": "n5FSrJzFaqnq3hbW",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        288
+      ],
+      "id": "c737dead-acac-4425-82b6-d264cebd6c5a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "TItWfHYj1l8DbnMN",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive Contact Form": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "AI Auto-Reply Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Auto-Reply Generator": {
+      "main": [
+        [
+          {
+            "node": "Auto-Reply to Sender",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Auto-Reply Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "278b3ef0-2886-4d6f-a256-768ac6d5fa48",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6b5edd2c39b4a1c2e87f05f11c7620a06f10d8120c9ff1b0d4d63816d9d9a1ad"
+  },
+  "nodeGroups": [],
+  "id": "YNyymFKHGfKz5n74",
+  "tags": []
+}
