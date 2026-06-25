@@ -1,3 +1,5 @@
+<img width="1915" height="899" alt="image" src="https://github.com/user-attachments/assets/21a9f3ee-5c7b-4444-a4d1-118bf8296af7" />
+
 # 📬 Portfolio Contact Form Notifier
 
 An AI-powered automation workflow built with **n8n** that triggers whenever someone submits a contact form on a portfolio website. It instantly notifies the owner via Gmail and Telegram, then uses **Google Gemini** to generate and send a personalized auto-reply to the sender — all without writing a single backend route.
